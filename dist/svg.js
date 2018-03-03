@@ -1309,8 +1309,13 @@ SVG.Situation = SVG.invent({
 
     this.duration = new SVG.Number(o.duration).valueOf()
     this.delay = new SVG.Number(o.delay).valueOf()
-
-    this.start = +new Date() + this.delay
+    this.timeline = o.timeline
+    
+    if(this.timeline) {
+      this.start = this.timeline + this.delay
+    } else {
+      this.start = +new Date + this.delay
+    }
     this.finish = this.start + this.duration
     this.ease = o.ease
 
@@ -1379,12 +1384,14 @@ SVG.FX = SVG.invent({
       if(typeof o == 'object'){
         ease = o.ease
         delay = o.delay
+        timeline = o.timeline
         o = o.duration
       }
 
       var situation = new SVG.Situation({
         duration: o || 1000,
         delay: delay || 0,
+        timeline: timeline || false,
         ease: SVG.easing[ease || '-'] || ease
       })
 
@@ -1458,7 +1465,11 @@ SVG.FX = SVG.invent({
 
     // start the current situation
   , startCurrent: function(){
-      this.situation.start = +new Date + this.situation.delay/this._speed
+      if(this.situation.timeline) {
+        this.situation.start = this.situation.timeline + this.situation.delay/this._speed
+      } else {
+        this.situation.start = +new Date + this.situation.delay/this._speed
+      }
       this.situation.finish = this.situation.start + this.situation.duration/this._speed
       return this.initAnimations().step()
     }
@@ -1636,7 +1647,12 @@ SVG.FX = SVG.invent({
         this.absPos += this.situation.loop
       }
 
-      this.situation.start = +new Date - this.absPos * durDivSpd
+      
+      if(this.situation.timeline) {
+        this.situation.start = this.situation.timeline - this.absPos * durDivSpd
+      } else {
+        this.situation.start = +new Date - this.absPos * durDivSpd
+      }
       this.situation.finish = this.situation.start + durDivSpd
 
       return this.step(true)
@@ -1792,8 +1808,13 @@ SVG.FX = SVG.invent({
      */
   , step: function(ignoreTime){
 
+      //ignoreTime = true;
+        
       // convert current time to an absolute position
-      if(!ignoreTime) this.absPos = this.timeToAbsPos(+new Date)
+      if(!ignoreTime) 
+        this.absPos = this.timeToAbsPos(+new Date)
+      else
+        this.absPos += 1000 / (this.situation.duration * 60);
 
       // This part convert an absolute position to a position
       if(this.situation.loops !== false) {
