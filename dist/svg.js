@@ -1811,7 +1811,7 @@ SVG.FX = SVG.invent({
       //ignoreTime = true;
         
       // convert current time to an absolute position
-      if(!ignoreTime) 
+      if(!ignoreTime && this.situation.timeline) 
         this.absPos = this.timeToAbsPos(+new Date)
       else
         this.absPos += 1000 / (this.situation.duration * 60);
